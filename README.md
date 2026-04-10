@@ -2,15 +2,6 @@
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
 This version simulates a content-based music recommender. It reads a catalog of 18 songs from a CSV file, scores each one against a user's stated genre, mood, and energy preferences, and returns the top 5 matches ranked by relevance score. Every recommendation includes a plain-language explanation of why it was chosen. The project was built to explore how recommendation systems turn raw data into personalized suggestions — and where simple scoring logic can go wrong.
 
 ---
@@ -32,6 +23,9 @@ Our version uses **pure content-based filtering**: it compares a user's stated t
 | `valence` | float (0.0–1.0) | Musical positiveness; higher = more upbeat |
 | `danceability` | float (0.0–1.0) | How suitable the track is for dancing |
 | `acousticness` | float (0.0–1.0) | Confidence that the track is acoustic |
+| `popularity` | int (0–100) | Estimated mainstream popularity score |
+| `release_decade` | int | Decade of release (e.g., 2000, 2010, 2020) |
+| `mood_tags` | string | Pipe-separated detailed mood descriptors (e.g., `euphoric\|upbeat\|summery`) |
 
 **Features used by the `UserProfile` object:**
 

@@ -26,11 +26,19 @@ Think of VibeFinder like a very literal matchmaker. You tell it three things: wh
 
 The three scores are added together. The maximum a song can earn is 4.0 (genre match + mood match + perfect energy). All songs are then sorted from highest to lowest, and the top 5 are returned along with the specific reasons why each one ranked where it did.
 
+Three optional advanced features can further adjust the score:
+
+- **Popularity proximity** — rewards songs whose mainstream popularity score is close to the user's target (max +0.5).
+- **Release decade match** — adds +0.5 if the song's decade matches the user's preferred decade.
+- **Mood tag overlap** — awards +0.5 per matching detailed mood tag (e.g., "euphoric," "nostalgic," "aggressive"), capped at +1.5. This allows finer emotional matching beyond the broad mood category.
+
+A **diversity penalty** is also available: when enabled, any song whose artist or genre already appears in the selected results loses 0.5 points, preventing one artist or genre from dominating the entire top-5 list.
+
 ---
 
 ## 4. Data
 
-The catalog contains **18 songs** stored in `data/songs.csv`. The starter dataset had 10 songs; 8 more were added to broaden coverage. Each song has the following attributes: `genre`, `mood`, `energy` (0.0–1.0), `tempo_bpm`, `valence` (0.0–1.0), `danceability` (0.0–1.0), and `acousticness` (0.0–1.0).
+The catalog contains **18 songs** stored in `data/songs.csv`. The starter dataset had 10 songs; 8 more were added to broaden coverage. Each song has 13 attributes: `genre`, `mood`, `energy` (0.0–1.0), `tempo_bpm`, `valence` (0.0–1.0), `danceability` (0.0–1.0), `acousticness` (0.0–1.0), `popularity` (0–100), `release_decade`, and `mood_tags` (pipe-separated detailed descriptors such as "euphoric|upbeat|summery").
 
 **Genres represented:** pop, lofi, rock, ambient, jazz, synthwave, indie pop, r&b, electronic, country, metal, hip-hop, blues.
 
@@ -62,11 +70,11 @@ Four user profiles were tested: **High-Energy Pop** (genre=pop, mood=happy, ener
 
 ## 8. Future Work
 
-**1. Include more song attributes in the score.** `Valence`, `danceability`, and `acousticness` are already in the CSV but never used. Adding even one of these — for example, rewarding songs whose valence is close to what a "happy" or "sad" user would want — would make the scoring meaningfully richer without changing the overall architecture.
+**1. Score valence, danceability, and acousticness.** These fields are already in the CSV but the base scoring formula ignores them. Adding proximity scoring for valence (musical positiveness) would make "happy" vs "sad" preferences far more precise — right now two songs with the same energy score identically even if one is bright and uplifting and the other is dark and heavy.
 
 **2. Replace exact string matching with fuzzy or hierarchical genre matching.** Right now, "indie pop" and "pop" are treated as completely different genres. A simple lookup table that groups related genres together (e.g., pop, indie pop, and synth-pop all belong to the "pop family") would dramatically reduce the binary-matching problem and surface more relevant results for edge-case genre preferences.
 
-**3. Add a diversity penalty to prevent repetitive top-5 lists.** Currently, if three songs share the same genre and similar energy, all three can stack near the top of the results. A simple rule — for example, no more than two songs from the same genre in the top 5 — would force more variety into the recommendations and better simulate what real platforms do to avoid monotony.
+**3. Simulate collaborative filtering alongside content-based scoring.** The current system is entirely blind to what other users enjoy. Building a second recommender that says "users who liked X also liked Y" — even with synthetic data — would allow direct comparison of the two approaches and show how collaborative filtering surfaces songs that content-based scoring can never find on its own.
 
 ---
 
