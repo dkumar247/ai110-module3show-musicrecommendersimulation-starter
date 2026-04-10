@@ -61,29 +61,13 @@ Prompts:
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+The most significant bias in this system is **genre dominance**: a genre match is worth +2.0 points while a mood match is only worth +1.0, meaning a song that shares the user's genre but has a completely wrong mood or mismatched energy will almost always outrank a song from a different genre that is a far better emotional fit. This creates a "genre bubble" — the user never encounters great songs outside their stated preference, even if those songs would feel identical to listen to. A second limitation is **catalog imbalance**: the dataset has 3 lofi songs and only 1 rock song, so a lofi listener gets more varied top results than a rock listener purely because the genre is better represented. Third, genre and mood are matched as **exact strings**, meaning "indie pop" gets zero credit toward a "pop" preference even though these genres heavily overlap — a subtlety the system cannot express. Finally, numerically rich fields like `valence`, `danceability`, `acousticness`, and `tempo_bpm` are **completely ignored** by the scoring formula, so a high-valence, danceable track scores identically to a slow, somber one as long as their energy values are the same.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
-
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+Four user profiles were tested: **High-Energy Pop** (genre=pop, mood=happy, energy=0.9), **Chill Lofi** (genre=lofi, mood=chill, energy=0.3), **Deep Intense Rock** (genre=rock, mood=intense, energy=0.8), and an **Adversarial profile** (genre=r&b, mood=sad, energy=0.9) designed to expose contradictions between genre and mood. In every case the correct "perfect match" song ranked #1 with a score near 4.0, which confirmed the scoring logic works as intended. The most interesting surprise was in the **Adversarial profile**: even though "sad" and "energy=0.9" feel like contradictory preferences (sad songs are usually slow and low-energy), the system still produced a reasonable #1 result — "Rainy Days & Neon Signs" (r&b/sad) — because genre and mood matched despite the energy gap penalty. A **weight experiment** was also run that doubled the energy weight and halved the genre weight: this caused "Spacewalk Thoughts" (ambient/chill, energy=0.28) to jump past "Focus Flow" (lofi/focused) in the Chill Lofi list, which arguably felt more accurate for a vibe-based listener. The experiment confirmed that the current genre-heavy weights favour genre loyalty over emotional fit, and that re-weighting can surface better results for users who define their taste by feeling rather than category.
 
 ---
 
