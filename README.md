@@ -17,17 +17,32 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommendation systems like Spotify or YouTube use two main strategies to predict what you'll enjoy. **Collaborative filtering** looks at patterns across many users — if people with similar listening history to yours also loved a particular song, the system suggests it to you too. **Content-based filtering** ignores other users entirely and instead analyzes the properties of songs you've already liked (tempo, genre, mood) to find new tracks that share those same qualities. Most production systems blend both approaches, but collaborative filtering requires massive amounts of user behavior data that we don't have in a classroom simulation.
 
-Some prompts to answer:
+Our version uses **pure content-based filtering**: it compares a user's stated taste preferences directly against each song's attributes to compute a relevance score, then ranks all songs from highest to lowest score and returns the top results. This approach is transparent and explainable — every recommendation comes with a reason tied to specific features — which makes it ideal for understanding the core mechanics of how recommenders work.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+**Features used by the `Song` object:**
 
-You can include a simple diagram or bullet list if helpful.
+| Feature | Type | Description |
+|---|---|---|
+| `genre` | string | Musical genre (e.g., pop, lofi, rock, jazz) |
+| `mood` | string | Emotional tone (e.g., happy, chill, intense, moody) |
+| `energy` | float (0.0–1.0) | Perceived intensity and activity level |
+| `tempo_bpm` | float | Beats per minute — pace of the track |
+| `valence` | float (0.0–1.0) | Musical positiveness; higher = more upbeat |
+| `danceability` | float (0.0–1.0) | How suitable the track is for dancing |
+| `acousticness` | float (0.0–1.0) | Confidence that the track is acoustic |
+
+**Features used by the `UserProfile` object:**
+
+| Preference | Type | Description |
+|---|---|---|
+| `favorite_genre` | string | The genre the user most wants to hear |
+| `favorite_mood` | string | The mood that best matches the user's current vibe |
+| `target_energy` | float (0.0–1.0) | The energy level the user is looking for |
+| `likes_acoustic` | bool | Whether the user prefers acoustic over electronic sounds |
+
+The scoring logic awards points for exact matches on genre and mood, and calculates a proximity score for numerical features like energy — so a song doesn't need to be a perfect match to appear in results, just the closest available fit.
 
 ---
 
