@@ -44,6 +44,44 @@ Our version uses **pure content-based filtering**: it compares a user's stated t
 
 The scoring logic awards points for exact matches on genre and mood, and calculates a proximity score for numerical features like energy — so a song doesn't need to be a perfect match to appear in results, just the closest available fit.
 
+### Algorithm Recipe
+
+Every song in the catalog is judged by the same three rules, and the results are added together into a single relevance score:
+
+| Rule | Points | Logic |
+|---|---|---|
+| Genre match | +2.0 | `song.genre == user.favorite_genre` |
+| Mood match | +1.0 | `song.mood == user.favorite_mood` |
+| Energy proximity | 0.0 – 1.0 | `1.0 - abs(song.energy - user.target_energy)` |
+
+**Why these weights?** Genre is the strongest signal of taste — a country fan and a metal fan rarely want the same song regardless of energy. Mood is secondary; two songs can share a genre but feel completely different emotionally. Energy is scored continuously so that songs close to the user's target are rewarded even if they don't hit it exactly.
+
+**Maximum possible score: 4.0** (genre match + mood match + perfect energy alignment)
+
+### Data Flow
+
+```mermaid
+flowchart TD
+    A([User Preferences\ngenre · mood · target_energy]) --> B[Load songs.csv\ninto list of dicts]
+    B --> C{For each song\nin catalog}
+    C --> D[Score: genre match?\n+2.0 pts]
+    C --> E[Score: mood match?\n+1.0 pt]
+    C --> F[Score: energy proximity\n1.0 − abs gap]
+    D --> G[Sum all points\n→ final score + reasons list]
+    E --> G
+    F --> G
+    G --> C
+    C --> H[Sort all scored songs\nhighest → lowest]
+    H --> I([Top K Recommendations\nwith scores and reasons])
+```
+
+### Known Biases and Limitations
+
+- **Genre dominance:** A genre match is worth twice as much as a mood match. Songs that share the user's genre will almost always outrank songs from other genres, even if those songs are a far better match in mood and energy. This can create a "genre bubble" where the user never sees great tracks outside their stated preference.
+- **Catalog imbalance:** If the dataset contains more songs of one genre than others, that genre will statistically appear in top results more often — not because those songs are better, but simply because there are more of them to match against.
+- **Binary matching:** Genre and mood are treated as exact string matches. A user who likes "indie pop" gets zero credit for a "pop" song and vice versa, even though those genres heavily overlap.
+- **Energy-only numerical scoring:** Tempo, valence, danceability, and acousticness are all ignored by the base recipe — a high-valence, highly danceable song gets the same energy-proximity score as a slow dirge, as long as both have the same energy value.
+
 ---
 
 ## Getting Started
